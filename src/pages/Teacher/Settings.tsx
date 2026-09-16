@@ -16,6 +16,8 @@ export default function TeacherSettings() {
   const [apiKey, setApiKey] = useState(userData?.geminiApiKey || '');
   const [name, setName] = useState(userData?.name || '');
   const [mobile, setMobile] = useState(userData?.mobile || '');
+  const [subject, setSubject] = useState(userData?.subject || '');
+  const [classes, setClasses] = useState(userData?.classes || '');
   
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -32,7 +34,9 @@ export default function TeacherSettings() {
       const updates = {
         name,
         mobile,
-        geminiApiKey: apiKey
+        geminiApiKey: apiKey,
+        subject,
+        classes
       };
       
       await updateDoc(doc(db, 'users', user.uid), updates);
@@ -72,6 +76,18 @@ export default function TeacherSettings() {
             <TextField 
               fullWidth label="Mobile Number" 
               value={mobile} onChange={e => setMobile(e.target.value)} 
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField 
+              fullWidth label="Subject" 
+              value={subject} onChange={e => setSubject(e.target.value)} 
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField 
+              fullWidth label="Classes Assigned (comma-separated)" 
+              value={classes} onChange={e => setClasses(e.target.value)} 
             />
           </Grid>
           <Grid size={{ xs: 12 }}>

@@ -16,6 +16,7 @@ import StudentTests from './Student/Tests';
 import TakeTest from './Student/TakeTest';
 import StudentHistory from './Student/History';
 import StudentProfile from './Student/Profile';
+import Logo from '../components/Logo';
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -34,9 +35,9 @@ export default function StudentDashboard() {
       <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider', color: 'text.primary' }}>
         <Toolbar>
           <Avatar sx={{ bgcolor: 'primary.main', mr: 2, width: 32, height: 32 }}>S</Avatar>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            ExamHall
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Logo size="small" />
+          </Box>
           <Button color="error" startIcon={<Logout />} onClick={handleLogout} sx={{ display: { xs: 'none', sm: 'flex' } }}>
             Logout
           </Button>

@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Box, Typography, Paper, Button, Alert, CircularProgress
 } from '@mui/material';
-import { School } from '@mui/icons-material';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useAuthStore } from '../store/useAuthStore';
+import Logo from '../components/Logo';
 import RoleSelection from '../components/RoleSelection';
 
 export default function LandingPage() {
@@ -86,19 +86,9 @@ export default function LandingPage() {
         {step === 'auth' ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             
-            <Box sx={{ 
-              bgcolor: 'primary.main', 
-              color: 'white', 
-              p: 2, 
-              borderRadius: '16px',
-              mb: 3 // 24px spacing
-            }}>
-              <School sx={{ fontSize: 40 }} />
+            <Box sx={{ mb: 4 }}>
+              <Logo size="large" />
             </Box>
-            
-            <Typography variant="h3" sx={{ fontWeight: "bold", color: "primary.main", mb: 2, letterSpacing: '-0.5px' }}>
-              ExamHall
-            </Typography>
             
             <Typography variant="body1" sx={{ color: "text.secondary", mb: 4, fontSize: '1.1rem', lineHeight: 1.5 }}>
               Smart Examination Platform for Schools, Colleges & Coaching Institutes

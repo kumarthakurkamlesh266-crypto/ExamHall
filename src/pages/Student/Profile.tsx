@@ -14,6 +14,8 @@ export default function StudentProfile() {
   const navigate = useNavigate();
   
   const [name, setName] = useState(userData?.name || '');
+  const [studentClass, setStudentClass] = useState(userData?.studentClass || '');
+  const [section, setSection] = useState(userData?.section || '');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +28,11 @@ export default function StudentProfile() {
     setSuccess('');
     setError('');
     try {
-      const updates = { name };
+      const updates = { 
+        name,
+        studentClass,
+        section
+      };
       await updateDoc(doc(db, 'users', user.uid), updates);
       setUserData({ ...userData, ...updates });
       setSuccess('Profile updated successfully!');
@@ -71,15 +77,15 @@ export default function StudentProfile() {
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField 
               fullWidth label="Class" 
-              value={userData?.studentClass || ''} 
-              disabled 
+              value={studentClass} 
+              onChange={e => setStudentClass(e.target.value)}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField 
               fullWidth label="Section" 
-              value={userData?.section || ''} 
-              disabled 
+              value={section} 
+              onChange={e => setSection(e.target.value)}
             />
           </Grid>
           

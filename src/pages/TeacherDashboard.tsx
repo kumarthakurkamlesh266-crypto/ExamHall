@@ -18,6 +18,7 @@ import CreateTest from './Teacher/CreateTest';
 import TeacherSettings from './Teacher/Settings';
 import TeacherResults from './Teacher/Results';
 import StudentsManagement from './Teacher/Students';
+import Logo from '../components/Logo';
 
 const drawerWidth = 260;
 
@@ -104,9 +105,9 @@ export default function TeacherDashboard() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            ExamHall
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Logo size="small" />
+          </Box>
         </Toolbar>
       </AppBar>
 
