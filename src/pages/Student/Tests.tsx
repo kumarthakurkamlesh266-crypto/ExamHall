@@ -17,7 +17,7 @@ export default function StudentTests() {
     if (!userData) return;
     const fetchTests = async () => {
       // Find tests matching student class
-      const q = query(collection(db, 'tests'), where('targetClass', '==', userData.studentClass));
+      const q = query(collection(db, 'tests'), where('targetClass', '==', Number(userData.studentClass || userData.standard)));
       const snap = await getDocs(q);
       
       let data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));

@@ -41,7 +41,7 @@ export default function StudentOverview() {
     if (!userData) return;
     const fetchUpcoming = async () => {
       try {
-        const q = query(collection(db, 'tests'), where('targetClass', '==', userData.studentClass));
+        const q = query(collection(db, 'tests'), where('targetClass', '==', Number(userData.studentClass || userData.standard)));
         const snap = await getDocs(q);
         let data = snap.docs.map(doc => doc.data());
         data = data.filter((test: any) => {

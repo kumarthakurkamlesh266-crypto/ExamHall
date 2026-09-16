@@ -164,9 +164,9 @@ export default function AIAssistant() {
                         </Box>
                       ))}
                     </Box>
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                      Explanation: {q.explanation}
-                    </Typography>
+                    <Box sx={{ typography: 'caption', color: "text.secondary", mt: 2, display: 'block' }}>
+                      <strong>Explanation:</strong> <MathText text={q.explanation} />
+                    </Box>
                   </Box>
                   <Box>
                     <Button variant="outlined" startIcon={<Add />} onClick={() => handleSaveToBank(q)}>

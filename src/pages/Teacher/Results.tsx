@@ -43,12 +43,17 @@ export default function TeacherResults() {
 
     try {
       // 1. Fetch Assigned Students based on targetClass and section
-      let studentsQuery = query(collection(db, 'users'), where('role', '==', 'student'), where('studentClass', '==', Number(test.targetClass)));
-      if (test.section) {
-        studentsQuery = query(studentsQuery, where('section', '==', test.section));
-      }
+      let studentsQuery = query(collection(db, 'users'), where('role', '==', 'student'));
       const studentsSnap = await getDocs(studentsQuery);
-      const studentsData = studentsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      let studentsData = studentsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      
+      // In-memory filter to support both 'standard' and 'studentClass' field variations safely
+      studentsData = studentsData.filter(s => {
+         const sClass = Number(s.studentClass || s.standard);
+         if (sClass !== Number(test.targetClass)) return false;
+         if (test.section && s.section !== test.section) return false;
+         return true;
+      });
       setAssignedStudents(studentsData);
 
       // 2. Fetch Results for this test
