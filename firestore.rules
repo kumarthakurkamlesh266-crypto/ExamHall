@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} { 
+      allow read, write: if false; 
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    function isTeacher() {
+      return isSignedIn() && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
+    }
+
+    // Teacher Profiles
+    match /teachers/{teacherId} {
+      allow read: if isSignedIn() && request.auth.uid == teacherId;
+      allow create: if isSignedIn() && isValidId(teacherId) && request.auth.uid == teacherId && incoming().keys().hasAll(['uid', 'name', 'email', 'createdAt']) && incoming().uid == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(teacherId) && request.auth.uid == teacherId && incoming().uid == existing().uid;
+    }
+
+    // Student Profiles
+    match /students/{studentId} {
+      allow read: if isSignedIn() && request.auth.uid == studentId;
+      allow create: if isSignedIn() && isValidId(studentId) && request.auth.uid == studentId && incoming().keys().hasAll(['uid', 'name', 'rollNumber', 'studentClass', 'section', 'createdAt']) && incoming().uid == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(studentId) && request.auth.uid == studentId && incoming().uid == existing().uid;
+    }
+
+    // Tests
+    match /tests/{testId} {
+      allow read: if isSignedIn();
+      allow create: if isTeacher() && isValidId(testId) && incoming().teacherId == request.auth.uid;
+      allow update: if isTeacher() && existing().teacherId == request.auth.uid && incoming().teacherId == existing().teacherId;
+      allow delete: if isTeacher() && existing().teacherId == request.auth.uid;
+    }
+
+    // Questions
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow create: if isTeacher() && isValidId(questionId) && incoming().teacherId == request.auth.uid;
+      allow update: if isTeacher() && existing().teacherId == request.auth.uid && incoming().teacherId == existing().teacherId;
+      allow delete: if isTeacher() && existing().teacherId == request.auth.uid;
+    }
+
+    // Results
+    match /results/{resultId} {
+      allow read: if isSignedIn() && (resource.data.studentId == request.auth.uid || resource.data.teacherId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(resultId) && incoming().studentId == request.auth.uid;
+      allow update: if isSignedIn() && (existing().studentId == request.auth.uid || existing().teacherId == request.auth.uid);
+    }
+
+    // Notices
+    match /notices/{noticeId} {
+      allow read: if isSignedIn();
+      allow create: if isTeacher() && isValidId(noticeId) && incoming().teacherId == request.auth.uid;
+      allow update: if isTeacher() && existing().teacherId == request.auth.uid && incoming().teacherId == existing().teacherId;
+      allow delete: if isTeacher() && existing().teacherId == request.auth.uid;
+    }
+
+    // Calendar Events
+    match /calendar_events/{eventId} {
+      allow read: if isSignedIn();
+      allow create: if isTeacher() && isValidId(eventId) && incoming().teacherId == request.auth.uid;
+      allow update: if isTeacher() && existing().teacherId == request.auth.uid && incoming().teacherId == existing().teacherId;
+      allow delete: if isTeacher() && existing().teacherId == request.auth.uid;
+    }
+
+    // Notes
+    match /notes/{noteId} {
+      allow read: if isSignedIn();
+      allow create: if isTeacher() && isValidId(noteId) && incoming().teacherId == request.auth.uid;
+      allow update: if isTeacher() && existing().teacherId == request.auth.uid && incoming().teacherId == existing().teacherId;
+      allow delete: if isTeacher() && existing().teacherId == request.auth.uid;
+    }
+  }
+}

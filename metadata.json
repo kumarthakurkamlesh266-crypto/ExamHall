@@ -1,0 +1,6 @@
+{
+  "name": "ExamHall",
+  "description": "Smart Examination Platform for Modern Schools",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

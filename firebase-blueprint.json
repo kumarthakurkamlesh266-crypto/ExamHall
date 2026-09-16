@@ -1,0 +1,172 @@
+{
+  "entities": {
+    "Teacher": {
+      "title": "Teacher Profile",
+      "description": "User profile for teachers",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "mobile": { "type": "string", "maxLength": 20 },
+        "subject": { "type": "string", "maxLength": 50 },
+        "assignedClasses": { "type": "array", "items": { "type": "string" } },
+        "profilePhoto": { "type": "string", "maxLength": 500 },
+        "geminiApiKey": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "createdAt"]
+    },
+    "Student": {
+      "title": "Student Profile",
+      "description": "User profile for students",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "rollNumber": { "type": "string", "maxLength": 50 },
+        "studentClass": { "type": "number", "minimum": 1, "maximum": 12 },
+        "section": { "type": "string", "maxLength": 10 },
+        "stream": { "type": "string", "enum": ["PCM", "PCB", "Commerce", "Arts"] },
+        "testsAttempted": { "type": "number" },
+        "averageScore": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "rollNumber", "studentClass", "section", "createdAt"]
+    },
+    "Test": {
+      "title": "Exam/Test",
+      "description": "Test created by a teacher",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 50 },
+        "targetClass": { "type": "number" },
+        "section": { "type": "string", "maxLength": 10 },
+        "duration": { "type": "number", "description": "Duration in minutes" },
+        "totalMarks": { "type": "number" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "questions": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teacherId", "name", "subject", "targetClass", "duration", "totalMarks", "startDate", "endDate", "createdAt"]
+    },
+    "Question": {
+      "title": "Question Bank Item",
+      "description": "A single question created by a teacher",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["MCQ", "MULTIPLE_CORRECT", "TRUE_FALSE", "NUMERICAL", "SHORT_ANSWER", "LONG_ANSWER"] },
+        "text": { "type": "string", "maxLength": 5000 },
+        "options": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+        "correctAnswers": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+        "explanation": { "type": "string", "maxLength": 2000 },
+        "subject": { "type": "string", "maxLength": 50 },
+        "questionClass": { "type": "number" },
+        "chapter": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teacherId", "type", "text", "subject", "questionClass", "createdAt"]
+    },
+    "Result": {
+      "title": "Test Result",
+      "description": "A student's result for a test",
+      "type": "object",
+      "properties": {
+        "testId": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "score": { "type": "number" },
+        "percentage": { "type": "number" },
+        "answers": { "type": "object" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["testId", "studentId", "teacherId", "score", "percentage", "submittedAt"]
+    },
+    "Notice": {
+      "title": "School Notice",
+      "description": "Notice for students created by a teacher",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "content": { "type": "string", "maxLength": 5000 },
+        "targetClass": { "type": "number" },
+        "targetSection": { "type": "string", "maxLength": 10 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teacherId", "title", "content", "createdAt"]
+    },
+    "CalendarEvent": {
+      "title": "Calendar Event",
+      "description": "Event in the school calendar",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "date": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["EXAM", "RESULT", "EVENT", "HOLIDAY"] },
+        "description": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teacherId", "title", "date", "type", "createdAt"]
+    },
+    "Note": {
+      "title": "Class Note",
+      "description": "Google Drive link to notes",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 50 },
+        "noteClass": { "type": "number" },
+        "description": { "type": "string", "maxLength": 1000 },
+        "driveLink": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teacherId", "title", "subject", "noteClass", "driveLink", "createdAt"]
+    }
+  },
+  "firestore": {
+    "teachers/{teacherId}": {
+      "schema": { "$ref": "#/entities/Teacher" },
+      "description": "Teacher profiles"
+    },
+    "students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Student profiles"
+    },
+    "tests/{testId}": {
+      "schema": { "$ref": "#/entities/Test" },
+      "description": "Tests created by teachers"
+    },
+    "questions/{questionId}": {
+      "schema": { "$ref": "#/entities/Question" },
+      "description": "Question bank"
+    },
+    "results/{resultId}": {
+      "schema": { "$ref": "#/entities/Result" },
+      "description": "Student test results"
+    },
+    "notices/{noticeId}": {
+      "schema": { "$ref": "#/entities/Notice" },
+      "description": "School notices"
+    },
+    "calendar_events/{eventId}": {
+      "schema": { "$ref": "#/entities/CalendarEvent" },
+      "description": "Calendar events"
+    },
+    "notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" },
+      "description": "Class notes links"
+    }
+  }
+}
