@@ -7,8 +7,10 @@ import {
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuthStore } from '../../store/useAuthStore';
-import { InlineMath, BlockMath } from 'react-katex';
+import MathText from '../../components/MathText';
 import 'katex/dist/katex.min.css';
+
+import TestScheduler from '../../components/TestScheduler';
 
 export default function CreateTest() {
   const { user, userData } = useAuthStore();
@@ -148,19 +150,19 @@ export default function CreateTest() {
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField fullWidth label="Duration (minutes)" type="number" value={duration} onChange={e => setDuration(Number(e.target.value))} required />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField fullWidth label="Start Date/Time" type="datetime-local" slotProps={{ inputLabel: { shrink: true } }} value={startDate} onChange={e => setStartDate(e.target.value)} required />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField fullWidth label="End Date/Time" type="datetime-local" slotProps={{ inputLabel: { shrink: true } }} value={endDate} onChange={e => setEndDate(e.target.value)} required />
-              </Grid>
+              <TestScheduler 
+                startDate={startDate} 
+                endDate={endDate} 
+                onStartDateChange={setStartDate} 
+                onEndDateChange={setEndDate} 
+              />
             </Grid>
           </Paper>
         </Grid>
         
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
               <Typography variant="h6">Select Questions</Typography>
               <Button size="small" variant="outlined" onClick={() => setOpenModal(true)}>+ Quick Add</Button>
             </Box>
@@ -168,7 +170,7 @@ export default function CreateTest() {
             <FormControl fullWidth sx={{ mb: 2, flexGrow: 1, overflowY: 'auto', maxHeight: '500px' }}>
               <Box>
                 {availableQuestions.map((q) => (
-                  <Box key={q.id} display="flex" alignItems="flex-start" mb={1} p={1} border={1} borderColor="divider" borderRadius={1}>
+                  <Box key={q.id} sx={{ display: "flex", alignItems: "flex-start", mb: 1, p: 1, border: 1, borderColor: "divider", borderRadius: 1 }}>
                     <Checkbox
                       checked={selectedQuestions.indexOf(q.id) > -1}
                       onChange={(e) => {
@@ -180,7 +182,7 @@ export default function CreateTest() {
                     <Box sx={{ ml: 1, overflow: 'hidden', width: '100%' }}>
                        <Typography variant="caption" display="block" sx={{ color: "text.secondary", mb: 0.5 }}>{q.type}</Typography>
                        <Box sx={{ fontSize: '0.875rem' }}>
-                         <InlineMath math={q.text.length > 60 ? q.text.substring(0, 60) + '...' : q.text} renderError={() => <span>{q.text}</span>} />
+                         <MathText text={q.text.length > 60 ? q.text.substring(0, 60) + '...' : q.text} />
                        </Box>
                     </Box>
                   </Box>

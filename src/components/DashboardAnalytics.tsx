@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Typography, Paper, Grid, Skeleton } from '@mui/material';
 import { People, Assignment, TrendingUp } from '@mui/icons-material';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -9,20 +9,34 @@ import {
   Tooltip as RechartsTooltip, ResponsiveContainer, Legend 
 } from 'recharts';
 
-const StatCard = ({ title, value, icon, color }: any) => (
+const StatCard = ({ title, value, icon, color, loading }: any) => (
   <Paper sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 3, borderRadius: 3, borderLeft: 6, borderColor: color }}>
-    <Box sx={{ p: 2, borderRadius: 2, bgcolor: `${color}15`, color }}>
-      {icon}
-    </Box>
-    <Box>
-      <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500 }}>{title}</Typography>
-      <Typography variant="h4" sx={{ fontWeight: "bold" }}>{value}</Typography>
+    {loading ? (
+      <Skeleton variant="rounded" width={56} height={56} />
+    ) : (
+      <Box sx={{ p: 2, borderRadius: 2, bgcolor: `${color}15`, color }}>
+        {icon}
+      </Box>
+    )}
+    <Box flex={1}>
+      {loading ? (
+        <>
+          <Skeleton variant="text" width="60%" height={24} />
+          <Skeleton variant="text" width="40%" height={40} />
+        </>
+      ) : (
+        <>
+          <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500 }}>{title}</Typography>
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>{value}</Typography>
+        </>
+      )}
     </Box>
   </Paper>
 );
 
 export default function DashboardAnalytics() {
   const { user } = useAuthStore();
+  const [loading, setLoading] = useState(true);
   const [totalStudents, setTotalStudents] = useState(0);
   const [activeTests, setActiveTests] = useState(0);
   const [avgPerformance, setAvgPerformance] = useState('0.0');
@@ -102,6 +116,11 @@ export default function DashboardAnalytics() {
       processData(currentTests, currentResults);
     });
 
+    // Mark as loaded after a short delay or when data arrives.
+    // For simplicity, we just mark it false once listeners are attached and have fired initially.
+    // Realistically, onSnapshot fires immediately with cached data or empty state.
+    setTimeout(() => setLoading(false), 800);
+
     return () => {
       unsubscribeStudents();
       unsubscribeTests();
@@ -113,17 +132,34 @@ export default function DashboardAnalytics() {
     <Box sx={{ mb: 6 }}>
       <Grid container spacing={3} mb={4}>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <StatCard title="Total Students" value={totalStudents} icon={<People fontSize="large" />} color="#3b82f6" />
+          <StatCard loading={loading} title="Total Students" value={totalStudents} icon={<People fontSize="large" />} color="#3b82f6" />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <StatCard title="Active Tests" value={activeTests} icon={<Assignment fontSize="large" />} color="#10b981" />
+          <StatCard loading={loading} title="Active Tests" value={activeTests} icon={<Assignment fontSize="large" />} color="#10b981" />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <StatCard title="Class Performance" value={`${avgPerformance}%`} icon={<TrendingUp fontSize="large" />} color="#f59e0b" />
+          <StatCard loading={loading} title="Class Performance" value={`${avgPerformance}%`} icon={<TrendingUp fontSize="large" />} color="#f59e0b" />
         </Grid>
       </Grid>
       
-      {chartData.length > 0 && (
+      {loading && (
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 6 }}>
+             <Paper sx={{ p: 3, borderRadius: 3 }}>
+               <Skeleton variant="text" width="50%" height={32} sx={{ mb: 3 }} />
+               <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 1 }} />
+             </Paper>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+             <Paper sx={{ p: 3, borderRadius: 3 }}>
+               <Skeleton variant="text" width="50%" height={32} sx={{ mb: 3 }} />
+               <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 1 }} />
+             </Paper>
+          </Grid>
+        </Grid>
+      )}
+      
+      {!loading && chartData.length > 0 && (
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Paper sx={{ p: 3, borderRadius: 3 }}>

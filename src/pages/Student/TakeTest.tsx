@@ -7,7 +7,7 @@ import {
 import { doc, getDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { useAuthStore } from '../../store/useAuthStore';
-import { InlineMath } from 'react-katex';
+import MathText from '../../components/MathText';
 
 export default function TakeTest() {
   const { testId } = useParams();
@@ -94,7 +94,7 @@ export default function TakeTest() {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  if (loading) return <Box p={4} display="flex" justifyContent="center"><CircularProgress /></Box>;
+  if (loading) return <Box p={4} sx={{ display: "flex", justifyContent: "center" }}><CircularProgress /></Box>;
   if (!test) return <Box p={4}><Typography>Test not found.</Typography></Box>;
 
   return (
@@ -108,9 +108,9 @@ export default function TakeTest() {
 
       {questions.map((q, idx) => (
         <Paper key={q.id} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-          <Typography variant="body1" sx={{ fontWeight: "bold", mb: 2 }}>
-            {idx + 1}. <InlineMath math={q.text} renderError={() => <span>{q.text}</span>} />
-          </Typography>
+          <Box sx={{ typography: 'body1', fontWeight: "bold", mb: 2, display: 'flex', gap: 1 }}>
+            <span>{idx + 1}.</span> <MathText text={q.text} />
+          </Box>
           
           {q.type === 'MCQ' && (
             <FormControl component="fieldset">
@@ -123,7 +123,7 @@ export default function TakeTest() {
                     key={i} 
                     value={opt} 
                     control={<Radio />} 
-                    label={<InlineMath math={opt} renderError={() => <span>{opt}</span>} />} 
+                    label={<MathText text={opt} />} 
                   />
                 ))}
               </RadioGroup>
@@ -132,7 +132,7 @@ export default function TakeTest() {
         </Paper>
       ))}
 
-      <Box display="flex" justifyContent="flex-end" mt={4}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
         <Button 
           variant="contained" 
           color="primary" 

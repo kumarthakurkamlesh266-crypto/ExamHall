@@ -116,7 +116,7 @@ export default function TeacherResults() {
 
     return (
       <Box>
-        <Stack direction="row" alignItems="center" mb={3} gap={1}>
+        <Stack direction="row" sx={{ alignItems: "center", mb: 3, gap: 1 }}>
           <IconButton onClick={() => setView('tests')}><ArrowBack /></IconButton>
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>Test Participation: {selectedTest.name}</Typography>
         </Stack>

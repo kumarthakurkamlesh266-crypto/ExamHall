@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Grid, Button, Chip } from '@mui/material';
+import { Box, Typography, Paper, Grid, Button, Chip, Skeleton } from '@mui/material';
 import { PlayArrow, Assignment } from '@mui/icons-material';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 export default function StudentTests() {
   const { userData } = useAuthStore();
   const [tests, setTests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function StudentTests() {
       });
 
       setTests(data);
+      setLoading(false);
     };
     fetchTests();
   }, [userData]);
@@ -46,14 +48,36 @@ export default function StudentTests() {
     <Box>
       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 4 }}>Available Tests</Typography>
       <Grid container spacing={3}>
-        {tests.map(test => {
+        {loading && (
+          <>
+            {[1, 2, 3].map((n) => (
+              <Grid key={n} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                    <Skeleton variant="rounded" width={80} height={24} />
+                    <Skeleton variant="text" width={40} />
+                  </Box>
+                  <Skeleton variant="text" width="80%" height={32} />
+                  <Skeleton variant="text" width="60%" sx={{ mb: 2 }} />
+                  <Box mb={3} flexGrow={1}>
+                    <Skeleton variant="text" width="90%" />
+                    <Skeleton variant="text" width="90%" />
+                    <Skeleton variant="text" width="40%" sx={{ mt: 1 }} />
+                  </Box>
+                  <Skeleton variant="rounded" width="100%" height={36} />
+                </Paper>
+              </Grid>
+            ))}
+          </>
+        )}
+        {!loading && tests.map(test => {
           const active = isTestActive(test.startDate, test.endDate);
           const upcoming = isUpcoming(test.startDate);
           
           return (
             <Grid key={test.id} size={{ xs: 12, sm: 6, md: 4 }}>
               <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Box display="flex" justifyContent="space-between" mb={2}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
                   <Chip 
                     label={active ? 'Active Now' : (upcoming ? 'Upcoming' : 'Ended')} 
                     color={active ? 'success' : (upcoming ? 'primary' : 'default')}
@@ -93,7 +117,7 @@ export default function StudentTests() {
             </Grid>
           );
         })}
-        {tests.length === 0 && (
+        {!loading && tests.length === 0 && (
           <Grid size={{ xs: 12 }}>
             <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
               <Assignment sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />

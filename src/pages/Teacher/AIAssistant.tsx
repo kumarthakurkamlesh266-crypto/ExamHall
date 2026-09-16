@@ -5,16 +5,18 @@ import {
 } from '@mui/material';
 import { AutoFixHigh, Add } from '@mui/icons-material';
 import { useAuthStore } from '../../store/useAuthStore';
-import { initializeGemini } from '../../lib/gemini';
+import { initializeGemini, generateWithFallback } from '../../lib/gemini';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { InlineMath } from 'react-katex';
+import MathText from '../../components/MathText';
 
 export default function AIAssistant() {
   const { user, userData } = useAuthStore();
+  
   const [topic, setTopic] = useState('');
   const [count, setCount] = useState(5);
   const [difficulty, setDifficulty] = useState('Medium');
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
@@ -24,28 +26,30 @@ export default function AIAssistant() {
       setError('Please configure your Gemini API Key in Settings first.');
       return;
     }
+
     setLoading(true);
     setError('');
     
     try {
       const genAI = initializeGemini(userData.geminiApiKey);
-      const model = genAI.models; // using the new sdk format
-
-      const prompt = `Generate ${count} multiple choice questions (MCQ) on the topic "${topic}" with ${difficulty} difficulty. 
-      Format the response strictly as a JSON array of objects. Each object must have:
-      - text: The question text (use KaTeX for math if applicable, e.g. E = mc^2)
+      
+      const prompt = `Act as an expert examiner. Generate ${count} high-quality, thought-provoking multiple choice questions (MCQ) on the topic "${topic}" at a ${difficulty} difficulty level.
+      CRITICAL INSTRUCTIONS FOR MATH/SCIENCE:
+      - You MUST format all mathematical formulas, symbols, and equations using LaTeX wrapped in single dollar signs for inline math (e.g., $F = ma$) or double dollar signs for block math (e.g., $E = mc^2$). 
+      - Treat the output as Markdown text. Do NOT use \text{} for normal text. Only wrap the actual math parts in $. Example: "A Carnot engine operates between $T_H = 500$ K and $T_C = 300$ K."
+      - Ensure high-quality distractors (wrong options) that address common student misconceptions.
+      - Keep explanations highly educational and concise.
+      
+      Format the response strictly as a JSON array of objects without markdown blockticks. Each object must have:
+      - text: The question text
       - options: An array of 4 string options
       - correctAnswers: An array containing the exactly one correct option string
-      - explanation: A short explanation
-      Example: [{"text": "What is 2+2?", "options": ["3", "4", "5", "6"], "correctAnswers": ["4"], "explanation": "2+2 equals 4"}]
-      Return ONLY valid JSON.`;
-
-      const response = await model.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
-
-      const text = response.text || '';
+      - explanation: A detailed step-by-step reasoning
+      
+      Return ONLY a valid JSON array. No conversational text.`;
+      
+      const text = await generateWithFallback(genAI, prompt) || '';
+      
       // Extract JSON array
       const jsonStart = text.indexOf('[');
       const jsonEnd = text.lastIndexOf(']');
@@ -100,7 +104,7 @@ export default function AIAssistant() {
       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 4 }}>ExamHall AI</Typography>
       
       <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
-        <Grid container spacing={3} alignItems="center">
+        <Grid container spacing={3} sx={{ alignItems: "center" }}>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField 
               fullWidth 
@@ -139,7 +143,6 @@ export default function AIAssistant() {
             </Button>
           </Grid>
         </Grid>
-
         {error && <Alert severity="error" sx={{ mt: 3 }}>{error}</Alert>}
       </Paper>
 
@@ -149,16 +152,16 @@ export default function AIAssistant() {
           <Grid container spacing={2}>
             {generatedQuestions.map((q, idx) => (
               <Grid key={idx} size={{ xs: 12 }}>
-                <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', justifyContent: 'space-between' }}>
+                <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', justifyContent: 'space-between', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
                   <Box>
-                    <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
-                      <InlineMath math={q.text} renderError={() => <span>{q.text}</span>} />
-                    </Typography>
+                    <Box sx={{ typography: 'body1', fontWeight: "bold", mb: 1 }}>
+                      <MathText text={q.text} />
+                    </Box>
                     <Box pl={2} mb={1}>
                       {q.options.map((opt: string, i: number) => (
-                        <Typography key={i} variant="body2" sx={{ color: q.correctAnswers.includes(opt) ? 'success.main' : 'text.secondary', fontWeight: q.correctAnswers.includes(opt) ? 'bold' : 'normal' }}>
-                          {String.fromCharCode(65 + i)}. <InlineMath math={opt} renderError={() => <span>{opt}</span>} />
-                        </Typography>
+                        <Box key={i} sx={{ typography: 'body2', color: q.correctAnswers.includes(opt) ? 'success.main' : 'text.secondary', fontWeight: q.correctAnswers.includes(opt) ? 'bold' : 'normal', display: 'flex', gap: 1 }}>
+                          <span>{String.fromCharCode(65 + i)}.</span> <MathText text={opt} />
+                        </Box>
                       ))}
                     </Box>
                     <Typography variant="caption" sx={{ color: "text.secondary" }}>

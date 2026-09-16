@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">ExamHall</string>
-    <string name="title_activity_main">ExamHall</string>
-    <string name="package_name">com.examhall.app</string>
-    <string name="custom_url_scheme">com.examhall.app</string>
-</resources>

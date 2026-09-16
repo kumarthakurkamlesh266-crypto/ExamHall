@@ -18,6 +18,7 @@ import CreateTest from './Teacher/CreateTest';
 import TeacherSettings from './Teacher/Settings';
 import TeacherResults from './Teacher/Results';
 import StudentsManagement from './Teacher/Students';
+import { PWAInstallButton } from '../components/PWAInstallButton';
 import Logo from '../components/Logo';
 
 const drawerWidth = 260;
@@ -107,6 +108,9 @@ export default function TeacherDashboard() {
           </IconButton>
           <Box sx={{ flexGrow: 1 }}>
             <Logo size="small" />
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <PWAInstallButton />
           </Box>
         </Toolbar>
       </AppBar>

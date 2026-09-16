@@ -9,7 +9,7 @@ import { collection, query, where, getDocs, addDoc, deleteDoc, doc, serverTimest
 import { db } from '../../lib/firebase';
 import { useAuthStore } from '../../store/useAuthStore';
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
+import MathText from '../../components/MathText';
 
 export default function QuestionBank() {
   const { user } = useAuthStore();
@@ -69,7 +69,7 @@ export default function QuestionBank() {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>Question Bank</Typography>
         <Button variant="contained" startIcon={<Add />} onClick={() => setOpen(true)}>
           Add Question
@@ -81,18 +81,18 @@ export default function QuestionBank() {
         {questions.map((q) => (
           <Grid key={q.id} size={{ xs: 12 }}>
             <Paper sx={{ p: 3, borderRadius: 2 }}>
-              <Box display="flex" justifyContent="space-between">
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Box>
                   <Chip label={q.type} size="small" sx={{ mb: 2 }} />
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    <InlineMath math={q.text} renderError={(err) => <span>{q.text}</span>} />
-                  </Typography>
+                  <Box sx={{ typography: 'body1', mb: 2 }}>
+                    <MathText text={q.text} />
+                  </Box>
                   {q.options && q.options.length > 0 && (
                     <Box pl={2}>
                       {q.options.map((opt: string, i: number) => (
-                        <Typography key={i} variant="body2" sx={{ color: q.correctAnswers.includes(opt) ? 'success.main' : 'text.secondary', fontWeight: q.correctAnswers.includes(opt) ? 'bold' : 'normal' }}>
-                          {String.fromCharCode(65 + i)}. <InlineMath math={opt} renderError={() => <span>{opt}</span>} />
-                        </Typography>
+                        <Box key={i} sx={{ typography: 'body2', color: q.correctAnswers.includes(opt) ? 'success.main' : 'text.secondary', fontWeight: q.correctAnswers.includes(opt) ? 'bold' : 'normal', display: 'flex', gap: 1 }}>
+                          <span>{String.fromCharCode(65 + i)}.</span> <MathText text={opt} />
+                        </Box>
                       ))}
                     </Box>
                   )}
@@ -136,7 +136,7 @@ export default function QuestionBank() {
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>Options</Typography>
                 {qOptions.map((opt, i) => (
-                  <Box key={i} display="flex" gap={2} mb={2} alignItems="center">
+                  <Box key={i} sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center" }}>
                     <TextField 
                       fullWidth size="small" label={`Option ${String.fromCharCode(65+i)}`} 
                       value={opt} onChange={e => {

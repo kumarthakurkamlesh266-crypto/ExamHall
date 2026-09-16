@@ -17,6 +17,7 @@ import TakeTest from './Student/TakeTest';
 import StudentHistory from './Student/History';
 import StudentProfile from './Student/Profile';
 import Logo from '../components/Logo';
+import { PWAInstallButton } from '../components/PWAInstallButton';
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -38,9 +39,12 @@ export default function StudentDashboard() {
           <Box sx={{ flexGrow: 1 }}>
             <Logo size="small" />
           </Box>
-          <Button color="error" startIcon={<Logout />} onClick={handleLogout} sx={{ display: { xs: 'none', sm: 'flex' } }}>
-            Logout
-          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <PWAInstallButton />
+            <Button color="error" startIcon={<Logout />} onClick={handleLogout} sx={{ display: { xs: 'none', sm: 'flex' } }}>
+              Logout
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
 
