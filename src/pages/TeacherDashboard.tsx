@@ -17,6 +17,7 @@ import AIAssistant from './Teacher/AIAssistant';
 import CreateTest from './Teacher/CreateTest';
 import TeacherSettings from './Teacher/Settings';
 import TeacherResults from './Teacher/Results';
+import StudentsManagement from './Teacher/Students';
 
 const drawerWidth = 260;
 
@@ -49,7 +50,7 @@ export default function TeacherDashboard() {
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Avatar sx={{ bgcolor: 'primary.main' }}>T</Avatar>
-        <Typography variant="h6" fontWeight="bold">Teacher Portal</Typography>
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>Teacher Portal</Typography>
       </Box>
       <Divider />
       <List sx={{ flexGrow: 1, px: 2, py: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -140,6 +141,7 @@ export default function TeacherDashboard() {
           <Route path="create-test" element={<CreateTest />} />
           <Route path="questions" element={<QuestionBank />} />
           <Route path="ai-assistant" element={<AIAssistant />} />
+          <Route path="students" element={<StudentsManagement />} />
           <Route path="results" element={<TeacherResults />} />
           <Route path="settings" element={<TeacherSettings />} />
         </Routes>

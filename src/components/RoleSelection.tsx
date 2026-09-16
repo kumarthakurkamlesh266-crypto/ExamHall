@@ -21,11 +21,13 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Form states for onboarding
+  // Teacher fields
   const [mobile, setMobile] = useState('');
   const [subject, setSubject] = useState('');
+  const [classesTeaching, setClassesTeaching] = useState('');
   const [geminiApiKey, setGeminiApiKey] = useState('');
 
+  // Student fields
   const [rollNumber, setRollNumber] = useState('');
   const [studentClass, setStudentClass] = useState<number | ''>('');
   const [section, setSection] = useState('');
@@ -42,20 +44,33 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
       const uid = googleUser.uid;
       const email = googleUser.email;
       const name = googleUser.displayName || (role === 'teacher' ? 'New Teacher' : 'New Student');
+      const photoUrl = googleUser.photoURL || '';
 
       if (role === 'teacher') {
         const teacherData = {
-          uid, name, email, mobile, subject, geminiApiKey,
-          assignedClasses: [],
+          uid, 
+          role: 'teacher', 
+          name, 
+          email, 
+          photoUrl,
+          mobile, 
+          subject, 
+          classesTeaching,
+          geminiApiKey,
           createdAt: new Date().toISOString()
         };
-        await setDoc(doc(db, 'teachers', uid), teacherData);
+        await setDoc(doc(db, 'users', uid), teacherData);
         setRole('teacher');
         setUserData({ id: uid, ...teacherData });
-        navigate('/teacher');
+        navigate('/teacher', { replace: true });
       } else {
         const studentData = {
-          uid, name, email, rollNumber, 
+          uid, 
+          role: 'student', 
+          name, 
+          email, 
+          photoUrl,
+          rollNumber, 
           studentClass: Number(studentClass), 
           section,
           stream: Number(studentClass) >= 11 ? stream : null,
@@ -63,10 +78,10 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
           averageScore: 0,
           createdAt: new Date().toISOString()
         };
-        await setDoc(doc(db, 'students', uid), studentData);
+        await setDoc(doc(db, 'users', uid), studentData);
         setRole('student');
         setUserData({ id: uid, ...studentData });
-        navigate('/student');
+        navigate('/student', { replace: true });
       }
     } catch (err: any) {
       setError(err.message || 'Failed to complete registration');
@@ -77,10 +92,10 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight="bold" align="center" mb={2}>
+      <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "center", mb: 2 }}>
         Complete Profile
       </Typography>
-      <Typography color="text.secondary" align="center" mb={4}>
+      <Typography sx={{ color: "text.secondary", textAlign: "center", mb: 4 }}>
         Please provide a few more details to set up your account.
       </Typography>
 
@@ -106,7 +121,7 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
           disabled
         />
         <TextField 
-          label="Name (from Google)" 
+          label="Full Name (from Google)" 
           value={googleUser?.displayName || ''}
           disabled
         />
@@ -124,6 +139,12 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
               required 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+            />
+            <TextField 
+              label="Classes Teaching (e.g. 10, 11, 12)" 
+              required 
+              value={classesTeaching}
+              onChange={(e) => setClassesTeaching(e.target.value)}
             />
             <TextField 
               label="Gemini API Key (Optional for AI features)" 
@@ -164,8 +185,8 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
                 value={stream}
                 onChange={(e) => setStream(e.target.value)}
               >
-                <MenuItem value="PCM">PCM (Physics, Chem, Math)</MenuItem>
-                <MenuItem value="PCB">PCB (Physics, Chem, Bio)</MenuItem>
+                <MenuItem value="Science (PCM)">Science (PCM)</MenuItem>
+                <MenuItem value="Science (PCB)">Science (PCB)</MenuItem>
                 <MenuItem value="Commerce">Commerce</MenuItem>
                 <MenuItem value="Arts">Arts</MenuItem>
               </TextField>

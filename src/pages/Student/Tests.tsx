@@ -18,7 +18,16 @@ export default function StudentTests() {
       // Find tests matching student class
       const q = query(collection(db, 'tests'), where('targetClass', '==', userData.studentClass));
       const snap = await getDocs(q);
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      let data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // Filter by section and stream if they are set on the test
+      data = data.filter(test => {
+        if (test.section && test.section !== userData.section) return false;
+        if (test.stream && test.stream !== userData.stream) return false;
+        return true;
+      });
+
       setTests(data);
     };
     fetchTests();
@@ -35,15 +44,14 @@ export default function StudentTests() {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight="bold" mb={4}>Available Tests</Typography>
-
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 4 }}>Available Tests</Typography>
       <Grid container spacing={3}>
         {tests.map(test => {
           const active = isTestActive(test.startDate, test.endDate);
           const upcoming = isUpcoming(test.startDate);
           
           return (
-            <Grid xs={12} sm={6} md={4} key={test.id}>
+            <Grid key={test.id} size={{ xs: 12, sm: 6, md: 4 }}>
               <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <Box display="flex" justifyContent="space-between" mb={2}>
                   <Chip 
@@ -51,13 +59,13 @@ export default function StudentTests() {
                     color={active ? 'success' : (upcoming ? 'primary' : 'default')}
                     size="small"
                   />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     {test.duration} mins
                   </Typography>
                 </Box>
                 
-                <Typography variant="h6" fontWeight="bold" mb={1}>{test.name}</Typography>
-                <Typography variant="body2" color="text.secondary" mb={2}>
+                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>{test.name}</Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
                   Subject: {test.subject}
                 </Typography>
                 
@@ -68,11 +76,10 @@ export default function StudentTests() {
                   <Typography variant="body2">
                     <strong>Ends:</strong> {format(new Date(test.endDate), 'MMM d, h:mm a')}
                   </Typography>
-                  <Typography variant="body2" mt={1}>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
                     <strong>Marks:</strong> {test.totalMarks}
                   </Typography>
                 </Box>
-
                 <Button 
                   variant="contained" 
                   fullWidth 
@@ -87,11 +94,11 @@ export default function StudentTests() {
           );
         })}
         {tests.length === 0 && (
-          <Grid xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
               <Assignment sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6">No Tests Available</Typography>
-              <Typography color="text.secondary">There are currently no tests scheduled for your class.</Typography>
+              <Typography sx={{ color: "text.secondary" }}>There are currently no tests scheduled for your class.</Typography>
             </Paper>
           </Grid>
         )}

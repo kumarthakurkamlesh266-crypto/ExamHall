@@ -43,11 +43,11 @@ export default function StudentHistory() {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight="bold" mb={4}>Test History</Typography>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 4 }}>Test History</Typography>
       
       {chartData.length > 0 && (
         <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
-          <Typography variant="h6" mb={2}>Performance Overview</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>Performance Overview</Typography>
           <Box height={300}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -89,7 +89,7 @@ export default function StudentHistory() {
             ))}
             {results.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} align="center">No test history available.</TableCell>
+                <TableCell colSpan={5} sx={{ textAlign: "center" }}>No test history available.</TableCell>
               </TableRow>
             )}
           </TableBody>

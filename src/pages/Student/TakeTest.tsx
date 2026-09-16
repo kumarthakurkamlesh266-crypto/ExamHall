@@ -100,15 +100,15 @@ export default function TakeTest() {
   return (
     <Box>
       <Paper sx={{ p: 2, mb: 3, position: 'sticky', top: 64, zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6" fontWeight="bold">{test.name}</Typography>
-        <Typography variant="h6" color={timeLeft < 60 ? 'error' : 'primary'}>
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>{test.name}</Typography>
+        <Typography variant="h6" sx={{ color: timeLeft < 60 ? 'error' : 'primary' }}>
           Time Left: {formatTime(timeLeft)}
         </Typography>
       </Paper>
 
       {questions.map((q, idx) => (
         <Paper key={q.id} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-          <Typography variant="body1" fontWeight="bold" mb={2}>
+          <Typography variant="body1" sx={{ fontWeight: "bold", mb: 2 }}>
             {idx + 1}. <InlineMath math={q.text} renderError={() => <span>{q.text}</span>} />
           </Typography>
           

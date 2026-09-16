@@ -88,7 +88,7 @@ export default function AIAssistant() {
       <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
         <AutoFixHigh sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
         <Typography variant="h5" gutterBottom>ExamHall AI Not Configured</Typography>
-        <Typography color="text.secondary" mb={3}>
+        <Typography sx={{ color: "text.secondary", mb: 3 }}>
           Please add your Gemini API Key in the Settings to enable ExamHall AI Question generation.
         </Typography>
       </Paper>
@@ -97,11 +97,11 @@ export default function AIAssistant() {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight="bold" mb={4}>ExamHall AI</Typography>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 4 }}>ExamHall AI</Typography>
       
       <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
         <Grid container spacing={3} alignItems="center">
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField 
               fullWidth 
               label="Topic (e.g. Thermodynamics, Calculus, World War 2)" 
@@ -109,7 +109,7 @@ export default function AIAssistant() {
               onChange={(e) => setTopic(e.target.value)}
             />
           </Grid>
-          <Grid xs={6} md={2}>
+          <Grid size={{ xs: 6, md: 2 }}>
             <TextField 
               fullWidth 
               type="number" 
@@ -118,7 +118,7 @@ export default function AIAssistant() {
               onChange={(e) => setCount(Number(e.target.value))}
             />
           </Grid>
-          <Grid xs={6} md={2}>
+          <Grid size={{ xs: 6, md: 2 }}>
             <TextField 
               fullWidth 
               label="Difficulty" 
@@ -126,7 +126,7 @@ export default function AIAssistant() {
               onChange={(e) => setDifficulty(e.target.value)}
             />
           </Grid>
-          <Grid xs={12} md={2}>
+          <Grid size={{ xs: 12, md: 2 }}>
             <Button 
               fullWidth 
               variant="contained" 
@@ -145,23 +145,23 @@ export default function AIAssistant() {
 
       {generatedQuestions.length > 0 && (
         <Box>
-          <Typography variant="h6" mb={2}>Generated Questions</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>Generated Questions</Typography>
           <Grid container spacing={2}>
             {generatedQuestions.map((q, idx) => (
-              <Grid xs={12} key={idx}>
+              <Grid key={idx} size={{ xs: 12 }}>
                 <Paper sx={{ p: 3, borderRadius: 2, display: 'flex', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="body1" fontWeight="bold" mb={1}>
+                    <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
                       <InlineMath math={q.text} renderError={() => <span>{q.text}</span>} />
                     </Typography>
                     <Box pl={2} mb={1}>
                       {q.options.map((opt: string, i: number) => (
-                        <Typography key={i} variant="body2" color={q.correctAnswers.includes(opt) ? 'success.main' : 'text.secondary'} fontWeight={q.correctAnswers.includes(opt) ? 'bold' : 'normal'}>
+                        <Typography key={i} variant="body2" sx={{ color: q.correctAnswers.includes(opt) ? 'success.main' : 'text.secondary', fontWeight: q.correctAnswers.includes(opt) ? 'bold' : 'normal' }}>
                           {String.fromCharCode(65 + i)}. <InlineMath math={opt} renderError={() => <span>{opt}</span>} />
                         </Typography>
                       ))}
                     </Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
                       Explanation: {q.explanation}
                     </Typography>
                   </Box>
