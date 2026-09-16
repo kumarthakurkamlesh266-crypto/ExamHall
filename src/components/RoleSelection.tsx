@@ -20,6 +20,7 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
   const [role, setLocalRole] = useState<'teacher' | 'student'>('student');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [name, setName] = useState(googleUser?.displayName || '');
 
   // Teacher fields
   const [mobile, setMobile] = useState('');
@@ -43,14 +44,14 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
     try {
       const uid = googleUser.uid;
       const email = googleUser.email;
-      const name = googleUser.displayName || (role === 'teacher' ? 'New Teacher' : 'New Student');
+      const finalName = googleUser.displayName || name || (role === 'teacher' ? 'New Teacher' : 'New Student');
       const photoUrl = googleUser.photoURL || '';
 
       if (role === 'teacher') {
         const teacherData = {
           uid, 
           role: 'teacher', 
-          name, 
+          name: finalName, 
           email, 
           photoUrl,
           mobile, 
@@ -67,7 +68,7 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
         const studentData = {
           uid, 
           role: 'student', 
-          name, 
+          name: finalName, 
           email, 
           photoUrl,
           rollNumber, 
@@ -116,14 +117,16 @@ export default function RoleSelection({ googleUser }: RoleSelectionProps) {
       <Box component="form" onSubmit={handleCompleteOnboarding} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         
         <TextField 
-          label="Email (from Google)" 
+          label="Email Address" 
           value={googleUser?.email || ''}
           disabled
         />
         <TextField 
-          label="Full Name (from Google)" 
-          value={googleUser?.displayName || ''}
-          disabled
+          label="Full Name" 
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={!!googleUser?.displayName}
         />
 
         {role === 'teacher' && (

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Box, Typography, Paper, Button, Alert, CircularProgress
+  Box, Typography, Paper, Button, Alert, CircularProgress, TextField, Divider
 } from '@mui/material';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -19,6 +19,11 @@ export default function LandingPage() {
   const [step, setStep] = useState<'auth' | 'onboarding'>('auth');
   const [googleUser, setGoogleUser] = useState<any>(null);
 
+  // Email/Password states
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   // Auto-redirect if already logged in and role is set
   useEffect(() => {
     if (user && role === 'teacher') {
@@ -31,6 +36,45 @@ export default function LandingPage() {
       setStep('onboarding');
     }
   }, [user, role, navigate, globalLoading]);
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      let userCred;
+      if (isLogin) {
+        userCred = await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        userCred = await createUserWithEmailAndPassword(auth, email, password);
+      }
+      
+      const userDoc = await getDoc(doc(db, 'users', userCred.user.uid));
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        if (data.role === 'teacher') {
+          navigate('/teacher', { replace: true });
+        } else {
+          navigate('/student', { replace: true });
+        }
+      } else {
+        // New user
+        setGoogleUser(userCred.user);
+        setStep('onboarding');
+      }
+    } catch (err: any) {
+      if (err.code === 'auth/email-already-in-use') {
+         setError('Email already exists. Please login instead.');
+      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+         setError('Invalid email or password.');
+      } else {
+         setError(err.message || 'Authentication failed');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -96,19 +140,64 @@ export default function LandingPage() {
             
             {error && <Alert severity="error" sx={{ mb: 3, width: '100%', textAlign: 'left' }}>{error}</Alert>}
             
+            <Box component="form" onSubmit={handleEmailAuth} sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+              <TextField 
+                label="Email" 
+                type="email" 
+                fullWidth 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField 
+                label="Password" 
+                type="password" 
+                fullWidth 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                fullWidth
+                sx={{ 
+                  height: '56px', 
+                  fontSize: '1.1rem', 
+                  fontWeight: 600,
+                  borderRadius: '12px'
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : (isLogin ? 'Login' : 'Sign Up')}
+              </Button>
+            </Box>
+
+            <Button 
+              variant="text" 
+              onClick={() => { setIsLogin(!isLogin); setError(''); }}
+              sx={{ mb: 2 }}
+            >
+              {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+            </Button>
+
+            <Divider sx={{ width: '100%', mb: 3 }}>OR</Divider>
+
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={handleGoogleSignIn}
               disabled={loading}
               fullWidth
               sx={{ 
-                height: '56px', 
-                fontSize: '1.1rem', 
+                height: '48px', 
+                fontSize: '1rem', 
                 fontWeight: 600,
-                borderRadius: '12px'
+                borderRadius: '12px',
+                color: 'text.primary',
+                borderColor: 'divider'
               }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Login / Register'}
+              Continue with Google (Web Only)
             </Button>
           </Box>
         ) : (
