@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Dependencies & Build Web
         run: |
-          npm install
+          npm install --no-package-lock
           npm run build
           npx cap sync android
 
@@ -33,11 +33,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: List Directory Structure
+      - name: Debug Directory Structure
         run: |
-          echo "Listing root directory structure:"
-          ls -la
+          echo "Listing full directory structure recursively:"
+          ls -R
           echo "====================================="
+          echo "Searching for build.gradle..."
+          find . -name "build.gradle" -not -path "*/node_modules/*"
           echo "Searching for gradlew..."
           find . -name "gradlew" -not -path "*/node_modules/*"
 
@@ -51,7 +53,7 @@ jobs:
             exit 1
           fi
           
-          # Get the directory containing gradlew (e.g., ./android or .)
+          # Get the directory containing gradlew
           GRADLEW_DIR=$(dirname "$GRADLEW_PATH")
           echo "Found gradlew in directory: $GRADLEW_DIR"
           
@@ -66,6 +68,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          # Uses a glob pattern to upload the APK regardless of whether it's in root or /android
           path: '**/app/build/outputs/apk/debug/app-debug.apk'
           if-no-files-found: error
